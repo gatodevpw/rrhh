@@ -165,17 +165,45 @@ describe("Rest API Departamentos", () => {
     //faltaria verificar que todos los elementos del array pertenezcan al objeto empleado
   });
 
-  it("PUT /api/v1/departamentos/empleado/10010/salario", async () => {
-    const salario = {emp_no: 10065, salary: 867599};
-    //Primero Agregamos
+  it("PUT /api/v1/departamentos/empleado/10014/salario", async () => {
+    const salario = {salary: 867599};
+    const date = new Date();
+    date.setUTCHours(3,0,0,0);
+ 
+    
+    const respuestaEsperada = {
+      "emp_no": 10014,
+      "last_name": "Genin",
+      "first_name": "Berni",
+      "salary": 867599,
+      "from_date": `${date.toISOString()}`,
+      "to_date": "9999-01-01T03:00:00.000Z"
+    }
+
+    respuestaEsperada.from_date=date;
+    //Primero modificamos
     const response = await request(app)
-      .post("/api/v1/departamentos")
-      .send(depto);
+      .put("/api/v1/departamentos/empleado/10014/salario")
+      .send(salario);
     expect(response).toBeDefined();
     expect(response.statusCode).toBe(201);
-    expect(response.body).toStrictEqual(depto);
+    expect(response.body.emp_no).toBe(respuestaEsperada.emp_no);
+    expect(response.body.from_date).toBe(date.toISOString());
+    expect(response.body.salary).toBe(respuestaEsperada.salary);
+    expect(response.body.to_date).toBe(respuestaEsperada.to_date);//SOLUCIONADO
+
+    //Eliminamos el registro insertado
+    
+    const responseDelete = await request(app)
+      .delete("/api/v1/departamentos/empleado/10014/salario")
+      .send();
+    expect(responseDelete).toBeDefined();
+    expect(responseDelete.statusCode).toBe(204);
+
 
   })
+
+  
 
 }
 

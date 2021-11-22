@@ -114,15 +114,12 @@ router.get('/empleado/:id/salario', async (req, res) => {
     res.status(200).json(salaries);
 })
 
-router.put('/empleado/:id/salario', async (req, res) => {
-    console.log("en el metodo para actualizar salario")
+router.delete('/empleado/:id/salario', async (req, res) => {
+    console.log("en el metodo para eliminar un registro de salario");
+    console.log(`el id del empleado a borrar es ${req.params.id}`);
 
-    const { salary } = req.body
-    if (!salary) {
-        res.status(400).send('salary es Requerido!!!')
-        return
-    }
     const emp = await DB.Departmens.getEmpById(req.params.id);
+    console.log("emp es: ")
     console.log(JSON.stringify(emp))
     if (!emp) {
         res.status(404).send('Empleado no encontrado!!!')
@@ -130,6 +127,49 @@ router.put('/empleado/:id/salario', async (req, res) => {
     }
 
     const salaries = await DB.Departmens.getSalaryByEmpNumber(emp);
+    console.log("salary es: ")
+    console.log(JSON.stringify(salaries[salaries.length - 1]))
+    if (!salaries) {
+        res.status(404).send('El empleado no posee salarios!!!')
+        return
+    }
+
+
+    console.log(`EL SALARIO ENVIADO PARA BORRAR ES ${JSON.stringify(salaries[salaries.length-1])}`)
+
+
+
+    const isDeleteOk = await DB.Departmens.deleteSalary(salaries[salaries.length - 1]);
+    if (isDeleteOk) {
+        res.status(204).send()
+    } else {
+        res.status(500).send('Falló al eliminar el salario!!!')
+    }
+
+});
+
+router.put('/empleado/:id/salario', async (req, res) => {
+    console.log("en el metodo para actualizar salario")
+
+    const { from_date, salary } = req.body
+    console.log(`el contenido del salario es: ${JSON.stringify(req.body)}` )
+   
+    if (!salary) {
+        res.status(400).send('salary es Requerido!!!')
+        return
+    }
+    
+    const emp = await DB.Departmens.getEmpById(req.params.id);
+    console.log("emp es: ")
+    console.log(JSON.stringify(emp))
+    if (!emp) {
+        res.status(404).send('Empleado no encontrado!!!')
+        return
+    }
+
+    const salaries = await DB.Departmens.getSalaryByEmpNumber(emp);
+    console.log("salary es: ")
+    console.log(JSON.stringify(salaries[salaries.length - 1]))
     if (!salaries) {
         res.status(404).send('El empleado no posee salarios!!!')
         return
@@ -137,9 +177,13 @@ router.put('/empleado/:id/salario', async (req, res) => {
 
     salaries[salaries.length - 1].salary = salary;
 
+    console.log("salary actualizado es: ")
+    console.log(JSON.stringify(salaries[salaries.length - 1]))
+    
     const isUpdateOk = await DB.Departmens.updateSalary(salaries[salaries.length - 1])
     if (isUpdateOk) {
-        res.status(200).json(salaries[salaries.length - 1])
+        const salaries = await DB.Departmens.getSalaryByEmpNumber(emp)
+        res.status(201).json(salaries[salaries.length - 1])
     } else {
         res.status(500).send('Falló al modificar el salario del empleado!!!')
     }
@@ -226,7 +270,7 @@ router.put('/manager/:id/departamento', async (req, res) => {
 
     const isUpdateOk = await DB.Departmens.updateManagerDepartment(departments[departments.length - 1])
     if (isUpdateOk) {
-        res.status(200).json(departments[departments.length - 1])
+        res.status(200).json(departments[departments.length - 1]);
     } else {
         res.status(500).send('Falló al modificar el depto del empleado!!!')
     }

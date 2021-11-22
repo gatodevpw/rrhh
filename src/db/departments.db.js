@@ -169,6 +169,27 @@ module.exports.getAllEmpByDept = async function (departamento) {
 };
 
 /**
+ * eliminar un registro de salario de un empleado
+ * @param {Object} salario 
+ * @returns 
+ */
+ module.exports.deleteSalary = async function (salario) {
+  let conn;
+  try {
+    console.log(`EL SALARIO A ELIMINAR ES: ${salario.emp_no}`)
+    conn = await pool.getConnection();
+    const rows = await conn.query(`DELETE FROM ${TABLES[2]} WHERE emp_no=? AND to_date='9999-01-01'`, [salario.emp_no]);
+    const update = await conn.query(`UPDATE ${TABLES[2]} SET to_date='9999-01-01' WHERE to_date=?`, [salario.from_date]);
+
+    return rows;
+  } catch (err) {
+    return Promise.reject(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
+
+/**
  *  Permite obtener el listado de sueldos de un empleado por su número de empleado (emp_no).
  * @param {Object} employee 
  * @returns 
@@ -207,13 +228,15 @@ module.exports.getSalaryByEmpNumber = async function (employee) {
  module.exports.updateSalary = async function (salary) {
   let conn;
   try {
+    console.log("EL SALARIO ES:")
+    console.log(JSON.stringify(salary.from_date))
     conn = await pool.getConnection();
-    const SQL_UPDATE = `UPDATE ${TABLES[2]}  SET to_date=CURRENT_DATE() WHERE emp_no=? AND to_date = '9999-01-01'`
-    const SQL_INSERT = `INSERT INTO ${TABLES[2]} (emp_no, salary, from_date, to_date) VALUES (?,?,CURRENT_DATE(),'9999-01-01')`
-    const params = [salary.emp_no, salary.salary] 
+    const SQL_UPDATE = `UPDATE ${TABLES[2]} SET to_date=CURRENT_DATE() WHERE emp_no=? AND to_date = '9999-01-01'`;
+    const SQL_INSERT = `INSERT INTO ${TABLES[2]} (emp_no, salary, from_date, to_date) VALUES (?,?,CURRENT_DATE(),'9999-01-01')`;
+    const params = [salary.emp_no, salary.salary]
     const rows_update = await conn.query(SQL_UPDATE, params[0]);
     const rows_insert = await conn.query(SQL_INSERT, params);
-    return [rows_update, rows_insert];
+    return rows_insert
   } catch (err) {
     return Promise.reject(err);
   } finally {
