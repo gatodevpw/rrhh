@@ -203,7 +203,53 @@ describe("Rest API Departamentos", () => {
 
   })
 
-  
+  it("GET /api/v1/departamentos/empleado/10014/departamento", async () => {
+    const response = await request(app).get("/api/v1/departamentos/empleado/10014/departamento");
+    expect(response).toBeDefined();
+    expect(response.statusCode).toBe(200);
+    const deptos = response.body;
+    const depto = deptos[0];
+    console.log(response.body[0])
+    expect(depto).toBeDefined();
+    expect(depto.emp_no).toBe(10014);
+    expect(depto.dept_no).toBeDefined();
+    expect(depto.dept_no).toBe("d005");
+    
+  });
+
+  it("PUT /api/v1/departamentos/empleado/10014/departamento", async () => {
+    const depto = {dept_no: "d006"};
+    const date = new Date();
+    date.setUTCHours(3,0,0,0);
+ 
+    
+    const respuestaEsperada = {
+      "emp_no": 10014,
+      "dept_no": "d006",
+      "from_date": `${date.toISOString()}`,
+      "to_date": "9999-01-01T03:00:00.000Z"
+    }
+
+    respuestaEsperada.from_date=date;
+    //Primero modificamos
+    const response = await request(app)
+      .put("/api/v1/departamentos/empleado/10014/departamento")
+      .send(depto);
+    expect(response).toBeDefined();
+    expect(response.statusCode).toBe(201);
+    expect(response.body.emp_no).toBe(respuestaEsperada.emp_no);
+    expect(response.body.dept_no).toBe(respuestaEsperada.dept_no);
+    console.log(`from datee: ${JSON.stringify(response.body)}`);
+    expect(response.body.from_date).toBe(date.toISOString());
+    expect(response.body.to_date).toBe(respuestaEsperada.to_date);
+
+    //Eliminamos el registro insertado
+    const responseDelete = await request(app)
+      .delete("/api/v1/departamentos/empleado/10014/departamento")
+      .send();
+    expect(responseDelete).toBeDefined();
+    expect(responseDelete.statusCode).toBe(204);
+  })
 
 }
 

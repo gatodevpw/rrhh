@@ -287,7 +287,27 @@ module.exports.getSalaryByEmpNumber = async function (employee) {
     const params = [dept.emp_no, dept.dept_no] 
     const rows_update = await conn.query(SQL_UPDATE, params[0]);
     const rows_insert = await conn.query(SQL_INSERT, params);
-    return [rows_update, rows_insert];
+    return rows_insert;
+  } catch (err) {
+    return Promise.reject(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
+
+/**
+ * eliminar un registro del depto de un empleado
+ * @param {Object} departamento 
+ * @returns 
+ */
+ module.exports.deleteDept = async function (departamento) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query(`DELETE FROM ${TABLES[3]} WHERE emp_no=? AND to_date='9999-01-01'`, [departamento.emp_no]);
+    const update = await conn.query(`UPDATE ${TABLES[3]} SET to_date='9999-01-01' WHERE to_date=?`, [departamento.from_date]);
+
+    return rows;
   } catch (err) {
     return Promise.reject(err);
   } finally {

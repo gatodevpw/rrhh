@@ -238,10 +238,39 @@ router.put('/empleado/:id/departamento', async (req, res) => {
 
     const isUpdateOk = await DB.Departmens.updateDepartment(departments[departments.length - 1])
     if (isUpdateOk) {
-        res.status(200).json(departments[departments.length - 1])
+        const departments = await DB.Departmens.getDeptByEmpNumber(emp);
+        res.status(201).json(departments[departments.length - 1])
     } else {
         res.status(500).send('Falló al modificar el depto del empleado!!!')
     }
+});
+
+router.delete('/empleado/:id/departamento', async (req, res) => {
+    console.log("en el metodo para eliminar un registro de departamentos");
+    console.log(`el id del empleado a borrar es ${req.params.id}`);
+
+    const emp = await DB.Departmens.getEmpById(req.params.id);
+    console.log("emp es: ")
+    console.log(JSON.stringify(emp))
+    if (!emp) {
+        res.status(404).send('Empleado no encontrado!!!')
+        return
+    }
+
+    const deptos = await DB.Departmens.getDeptByEmpNumber(emp);
+    console.log(`deptos: ${JSON.stringify(deptos[deptos.length - 1])}`);
+    if (!deptos) {
+        res.status(404).send('El empleado no posee departamentos!!!')
+        return
+    }
+
+    const isDeleteOk = await DB.Departmens.deleteDept(deptos[deptos.length - 1]);
+    if (isDeleteOk) {
+        res.status(204).send()
+    } else {
+        res.status(500).send('Falló al eliminar el salario!!!')
+    }
+
 });
 
 // PUT /api/v1/manager/:id/departamento

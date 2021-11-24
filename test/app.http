@@ -76,12 +76,15 @@ DELETE {{API_DEPARTAMENTOS}}/empleado/10014/salario
 GET {{API_DEPARTAMENTOS}}/empleado/10010
 
 ### obtener el departamento del empleado
-GET {{API_DEPARTAMENTOS}}/empleado/10004/departamento
+GET {{API_DEPARTAMENTOS}}/empleado/10014/departamento
 
 ### Actualizar el departamento de un empleado
-PUT {{API_DEPARTAMENTOS}}/empleado/10004/departamento
+PUT {{API_DEPARTAMENTOS}}/empleado/10014/departamento
 Content-Type: application/json
 
 {
-  "dept_no": "d005"
+  "dept_no": "d006"
 }
+
+### eliminar el registro de un departamento
+DELETE {{API_DEPARTAMENTOS}}/empleado/10014/departamento
