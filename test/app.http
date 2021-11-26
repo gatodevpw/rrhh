@@ -88,3 +88,17 @@ Content-Type: application/json
 
 ### eliminar el registro de un departamento
 DELETE {{API_DEPARTAMENTOS}}/empleado/10014/departamento
+
+### obtener el departamento del manager
+GET {{API_DEPARTAMENTOS}}/manager/110039/departamento
+
+### Actualizar el departamento de un manager
+PUT {{API_DEPARTAMENTOS}}/manager/110039/departamento
+Content-Type: application/json
+
+{
+  "dept_no": "d006"
+}
+
+### eliminar el registro de un departamento
+DELETE {{API_DEPARTAMENTOS}}/manager/110039/departamento

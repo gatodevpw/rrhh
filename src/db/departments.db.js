@@ -339,4 +339,53 @@ module.exports.getSalaryByEmpNumber = async function (employee) {
   }
 };
 
+/**
+ * eliminar un registro del depto de un manager
+ * @param {Object} departamento 
+ * @returns 
+ */
+ module.exports.deleteManagerDept = async function (departamento) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query(`DELETE FROM ${TABLES[4]} WHERE emp_no=? AND to_date='9999-01-01'`, [departamento.emp_no]);
+    const update = await conn.query(`UPDATE ${TABLES[4]} SET to_date='9999-01-01' WHERE to_date=?`, [departamento.from_date]);
+
+    return rows;
+  } catch (err) {
+    return Promise.reject(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
+
+/**
+ *  Permite obtener el depto de un manager por su número de empleado (emp_no).
+ * @param {Object} manager 
+ * @returns 
+ */
+ module.exports.getDeptByMngNumber = async function (manager) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const SQL = `
+    SELECT
+      e.emp_no,
+      d.dept_no,
+      d.from_date,
+      d.to_date
+    FROM dept_manager d
+        INNER JOIN employees e USING (emp_no)
+    WHERE emp_no = ?
+`;
+    const rows = await conn.query(SQL, [manager.emp_no]);
+    console.log(rows)
+    return rows;
+  } catch (err) {
+    return Promise.reject(err);
+  } finally {
+    if (conn) await conn.release();
+  }
+};
+
 
